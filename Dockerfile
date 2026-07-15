@@ -1,4 +1,4 @@
-FROM ubuntu:24.04
+FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
@@ -8,19 +8,38 @@ RUN apt-get update && apt-get install -y \
     git \
     wget \
     build-essential \
-    python3 \
-    python3-pip \
-    && rm -rf /var/lib/apt/lists/*
+    zip \
+    unzip \
+    tar \
+    gzip \
+    bzip2 \
+    openssh-server \
+    net-tools \
+    nano \
+    runit
 
-RUN curl -fsSL https://code-server.dev/install.sh | sh
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
-RUN echo "ubuntu ALL=(ALL) NOPASSWD:ALL" >> /etc/sudoers
+RUN mkdir -p /etc/sv/sshd
+RUN echo '#!/bin/sh' > /etc/sv/sshd/run \
+&& echo 'exec /usr/sbin/sshd -D' >> /etc/sv/sshd/run \
+&& chmod +x /etc/sv/sshd/run
 
-RUN mkdir -p /home/ubuntu/workspace && chown -R ubuntu:ubuntu /home/ubuntu
+RUN mkdir -p /etc/sv/tailscale
+RUN echo '#!/bin/sh' > /etc/sv/tailscale/run \
+&& echo 'exec tailscaled --tun=userspace-networking --state=/var/lib/tailscale/tailscale.state' >> /etc/sv/tailscale/run \
+&& chmod +x /etc/sv/tailscale/run
 
-USER ubuntu
-WORKDIR /home/ubuntu/workspace
+RUN ln -s /etc/sv/sshd /etc/service/
+RUN ln -s /etc/sv/tailscale /etc/service/
 
-EXPOSE 7860
+RUN curl -fsSL https://tailscale.com/install.sh | sh
 
-CMD ["code-server", "--bind-addr", "0.0.0.0:7860", "--auth", "none"]
+RUN echo '#!/bin/sh' > /start.sh \
+&& echo 'sleep 4' >> /start.sh \
+&& echo 'tailscale up --auth-key=tskey-auth-kxgLdVzXuf11CNTRL-C36Hymfa9UQHiCeHnDugUQrJizyxzFN8Z' >> /start.sh \
+&& chmod +x /start.sh
+
+USER root
+
+CMD ["/bin/sh","-c","/sbin/runsvdir /etc/service & /start.sh ; wait"]
