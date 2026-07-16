@@ -2,6 +2,13 @@ FROM ubuntu:latest
 
 ENV DEBIAN_FRONTEND=noninteractive
 
+RUN cat > /etc/apt/sources.list <<'EOF'
+deb http://archive.ubuntu.com/ubuntu/ noble main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-security main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-updates main restricted universe multiverse
+deb http://archive.ubuntu.com/ubuntu/ noble-backports main restricted universe multiverse
+EOF
+
 RUN apt-get update && apt-get install -y \
     curl \
     sudo \
