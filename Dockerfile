@@ -61,8 +61,6 @@ RUN apt-get update && apt-get install -y \
     bsdmainutils \
     openssh-server
 
-RUN yes | unminimize
-
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
 
 RUN mkdir -p /etc/sv/sshd
