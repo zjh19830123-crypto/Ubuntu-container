@@ -24,6 +24,8 @@ RUN apt-get update && apt-get install -y \
     gzip \
     bzip2 \
     runit \
+    openssh-server \
+    unminimize \
     net-tools \
     iproute2 \
     ca-certificates \
@@ -52,6 +54,8 @@ RUN apt-get update && apt-get install -y \
     bc \
     passwd \
     default-jdk
+
+RUN yes | unminimize
 
 RUN curl -fsSL https://code-server.dev/install.sh | sh
 
