@@ -1,12 +1,6 @@
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=Asia/Shanghai DEBIAN_FRONTEND=noninteractive
-RUN cat > /etc/apt/sources.list <<'EOF'
-deb http://archive.ubuntu.com/ubuntu/ resolute main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ resolute-security main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ resolute-updates main restricted universe multiverse
-deb http://archive.ubuntu.com/ubuntu/ resolute-backports main restricted universe multiverse
-EOF
 RUN apt-get update && apt-get install -y \
     curl \
     sudo \
