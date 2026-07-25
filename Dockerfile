@@ -15,7 +15,6 @@ unzip \
 tar \
 gzip \
 bzip2 \
-runit \
 unminimize \
 net-tools \
 iproute2 \
@@ -39,7 +38,8 @@ fdisk \
 telnet \
 tcpdump \
 rsync \
-jq \ripgrep \
+jq \
+ripgrep \
 watch \
 bc \
 passwd \
@@ -50,7 +50,6 @@ patch \
 groff-base \
 mtr \
 bsdmainutils \
-openssh-server \
 ubuntu-minimal \
 ubuntu-server-minimal \
 language-pack-zh-hans xfce4-terminal
