@@ -44,7 +44,7 @@ ripgrep \
 watch \
 bc \
 passwd \
-default-jdk
+default-jdk \
 man-db \
 diffutils \
 patch \
@@ -54,7 +54,7 @@ bsdmainutils \
 openssh-server \
 ubuntu-minimal \
 ubuntu-server-minimal \
-RUN apt install language-pack-zh-hans -y
+language-pack-zh-hans
 RUN locale-gen zh_CN.UTF-8
 RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
 RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
