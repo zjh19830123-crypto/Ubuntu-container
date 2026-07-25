@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive
-ENV TZ=Asia/Shanghai
+ENV TZ=Asia/Shanghai DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y \
 curl \
 sudo \
