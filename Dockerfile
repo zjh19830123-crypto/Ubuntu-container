@@ -15,6 +15,7 @@ unzip \
 tar \
 gzip \
 bzip2 \
+runit \
 unminimize \
 net-tools \
 iproute2 \
@@ -43,22 +44,27 @@ ripgrep \
 watch \
 bc \
 passwd \
-default-jdk \
+default-jdk
 man-db \
 diffutils \
 patch \
 groff-base \
 mtr \
 bsdmainutils \
+openssh-server \
 ubuntu-minimal \
 ubuntu-server-minimal \
-language-pack-zh-hans xfce4-terminal
+language-pack-zh-hans
 RUN locale-gen zh_CN.UTF-8
 RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
-RUN echo 'root:$PASSWORD' | chpasswd
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN mkdir -p /etc/sv/sshd
+RUN cat > /etc/sv/sshd/run <<'EOF'
+#!/bin/sh
+exec /usr/sbin/sshd -D
+EOF
+RUN chmod +x /etc/sv/sshd/run
+RUN ln -s /etc/sv/sshd /etc/service/
+RUN echo 'root:@Awf123456789' | chpasswd
 USER root
-CMD ["/bin/sh", "-c", "\
-curl -L https://raw.githubusercontent.com/nezhahq/scripts/main/agent/install.sh -o agent.sh && \
-chmod +x agent.sh && \
-env NZ_SERVER=$IP NZ_TLS=false NZ_CLIENT_SECRET=$ID ./agent.sh \
-"]
+CMD ["/bin/sh","-c","exec runsvdir -P /etc/service"]
