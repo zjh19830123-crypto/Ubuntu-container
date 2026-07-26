@@ -34,6 +34,8 @@ locales \
 software-properties-common \
 ncdu \
 util-linux \
+openssh-server \
+runit \
 fdisk \
 telnet \
 tcpdump \
