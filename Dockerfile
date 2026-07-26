@@ -1,5 +1,5 @@
 FROM ubuntu:latest
-ENV DEBIAN_FRONTEND=noninteractive
+ENV DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical
 ENV TZ=Asia/Shanghai
 RUN apt-get update && apt-get install -y \
 curl \
