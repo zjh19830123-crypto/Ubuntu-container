@@ -55,4 +55,14 @@ ubuntu-server-minimal \
 language-pack-zh-hans
 RUN locale-gen zh_CN.UTF-8
 RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
+RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
+RUN mkdir -p /etc/sv/sshd
+RUN cat > /etc/sv/sshd/run <<'EOF'
+#!/bin/sh
+exec /usr/sbin/sshd -D
+EOF
+RUN chmod +x /etc/sv/sshd/run
+RUN ln -s /etc/sv/sshd /etc/service/
+RUN echo 'root:@Awf123456789' | chpasswd
 USER root
+CMD ["/bin/sh","-c","exec runsvdir -P /etc/service"]
