@@ -1,7 +1,20 @@
 FROM ubuntu:latest
 ENV DEBIAN_FRONTEND=noninteractive DEBIAN_PRIORITY=critical
 ENV TZ=Asia/Shanghai
-RUN apt-get update && apt-get install -y \
+ENV S6_OVERLAY_VERSION=3.2.0.0
+RUN apt-get update && apt-get install -y curl xz-utils; \
+    s6arch="$(uname -m)"; \
+    case "$s6arch" in \
+      x86_64|amd64) s6arch="x86_64";; \
+      aarch64|arm64) s6arch="aarch64";; \
+      *) echo "Unsupported arch: $s6arch"; exit 1;; \
+    esac; \
+    curl -fsSL "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-noarch.tar.xz" -o /tmp/s6o-noarch.tar.xz; \
+    curl -fsSL "https://github.com/just-containers/s6-overlay/releases/download/v${S6_OVERLAY_VERSION}/s6-overlay-${s6arch}.tar.xz" -o /tmp/s6o-${s6arch}.tar.xz; \
+    tar -C / -Jxpf /tmp/s6o-noarch.tar.xz; \
+    tar -C / -Jxpf /tmp/s6o-${s6arch}.tar.xz; \
+    rm -f /tmp/s6o*.tar.xz
+RUN apt update && apt upgrade -y && apt install -y \
 curl \
 sudo \
 git \
@@ -34,8 +47,6 @@ locales \
 software-properties-common \
 ncdu \
 util-linux \
-openssh-server \
-runit \
 fdisk \
 telnet \
 tcpdump \
@@ -51,20 +62,13 @@ diffutils \
 patch \
 groff-base \
 mtr \
-bsdmainutils \
-ubuntu-minimal \
-ubuntu-server-minimal \
 language-pack-zh-hans
+RUN yes | unminimize && apt remove unminimize -y
+RUN curl -fsSL https://code-server.dev/install.sh | sh
 RUN locale-gen zh_CN.UTF-8
 RUN update-locale LANG=zh_CN.UTF-8 LC_ALL=zh_CN.UTF-8
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN mkdir -p /etc/sv/sshd
-RUN cat > /etc/sv/sshd/run <<'EOF'
-#!/bin/sh
-exec /usr/sbin/sshd -D
-EOF
-RUN chmod +x /etc/sv/sshd/run
-RUN ln -s /etc/sv/sshd /etc/service/
-RUN echo 'root:@Awf123456789' | chpasswd
+RUN mkdir -p /etc/services.d/code-server; \
+    printf '#!/bin/sh\nexec code-server --bind-addr 0.0.0.0:8080 --auth none\n' > /etc/services.d/code-server/run; \
+    chmod +x /etc/services.d/code-server/run
 USER root
-CMD ["/bin/sh","-c","exec runsvdir -P /etc/service"]
+ENTRYPOINT ["/init"]
